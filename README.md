@@ -19,32 +19,35 @@ const queryUrl = 'https://rest.logentries.com/query/logs';
 
 const queryLogentries = queryLogentriesFactory(apiKey, queryUrl);
 const opts = {
-	// Required. Set it to the id of the log in logEntries you wish to query
+	// Required. Set it to the id of the log in logEntries you wish
+	// to query
 	logId: '7d9ff278-3a6d-4c7a-8e65-df89fd3f5a96',
 
-	// Required. Set it to any valid value or stringDate that can be passed
-	// to a javascript Date object
+	// Required. Set it to any valid value or stringDate that can
+	//be passed to a javascript Date object
 	from: '2017-01-01T00:00:00.000',
 
-	// Optional. If empty will default to now. Set it to any valid value or
-	// stringDate that can be passed to a javascript Date object
+	// Optional. If empty will default to now. Set it to any valid
+	// value or stringDate that can be passed to a javascript Date
+	// object
 	to: '2017-01-02T23:59:59.999',
 
-	// Optional. Default to 'where()'. The leql query you wish to query with.
-	// Please ensure it is a valid leql query or you get statusCode 400 errors
-	// from logEntries.
+	// Optional. Default to 'where()'. The leql query you wish to
+	// query with. Please ensure it is a valid leql query or you
+	// get statusCode 400 errors from logEntries.
 	leqlQuery: 'where(method=GET)',
 
-	// Optional. Defaults to 50. How many messages should retried per paging
-	// request made to logEntries
+	// Optional. Defaults to 50. How many messages should retried
+	// per paging request made to logEntries
 	perPage: 50,
 
-	// Optional. Defaults to 30000 (30 seconds). How long should the request
-	// wait before it times out
+	// Optional. Defaults to 30000 (30 seconds). How long should
+	//the request wait before it times out
 	timeout: 30000,
 
-	// Optional. Defaults to 5000 (5 seconds). How long should this module
-	// wait when checking if a query response is finished on logEntries
+	// Optional. Defaults to 5000 (5 seconds). How long should
+	// this module wait when checking if a query response is
+	// finished on logEntries
 	pollInterval: 5000
 };
 
