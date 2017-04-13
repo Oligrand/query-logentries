@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/query-logentries.svg)](https://badge.fury.io/js/query-logentries) [![Build Status](https://travis-ci.org/Oligrand/query-logentries.svg?branch=master)](https://travis-ci.org/Oligrand/query-logentries) [![Dependency Status](https://david-dm.org/Oligrand/query-logentriess.svg)](https://david-dm.org/Oligrand/query-logentries) [![devDependency Status](https://david-dm.org/Oligrand/query-logentries/dev-status.svg)](https://david-dm.org/Oligrand/query-logentries#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/github/Oligrand/query-logentries/badge.svg?branch=master)](https://coveralls.io/github/Oligrand/query-logentries?branch=master)
 
-Query logentries.com via their REST API. Returns only the raw log messages you passed to logEntries at the time of logging. Uses [request-retry-stream](https://www.npmjs.com/package/request-retry-stream) in order to be more robust in case of network glitches.
+Query [logentries.com](https://logentries.com/) via their REST API. Returns only the raw log messages you passed to logEntries at the time of logging. Uses [request-retry-stream](https://www.npmjs.com/package/request-retry-stream) in order to be more robust in case of network glitches.
 
 	npm install --save query-logentries
 
