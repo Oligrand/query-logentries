@@ -3,17 +3,17 @@ var from2 = require('from2');
 var pump = require('pump');
 var concatStream = require('concat-stream');
 
-module.exports = function (apiKey) {
+module.exports = function (apiKey, queryUrl) {
 	var defaultRequestOpts = {
 		headers: { 'x-api-key': apiKey },
 		json: true
 	};
+	queryUrl = queryUrl || 'https://rest.logentries.com/query/logs';
 
 	return function(opts, callback) {
 		if(!opts.logId) { throw new Error('logId must be defined'); }
 		if(!opts.from) { throw new Error('from must be defined'); }
 
-		var queryUrl = opts.queryUrl || 'https://rest.logentries.com/query/logs';
 		var leqlQuery = opts.leqlQuery || 'where()';
 		var perPage = opts.perPage || 50;
 		defaultRequestOpts.timeout = opts.timeout || 30000;

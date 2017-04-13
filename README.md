@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/query-logentries.svg)](https://badge.fury.io/js/query-logentries) [![Build Status](https://travis-ci.org/oligrand/query-logentries.svg?branch=master)](https://travis-ci.org/oligrand/query-logentries) [![Dependency Status](https://david-dm.org/oligrand/query-logentriess.svg)](https://david-dm.org/oligrand/query-logentries) [![devDependency Status](https://david-dm.org/oligrand/query-logentries/dev-status.svg)](https://david-dm.org/oligrand/query-logentries#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/github/oligrand/query-logentries/badge.svg?branch=master)](https://coveralls.io/github/oligrand/query-logentries?branch=master)
 
-Query logentries.com via their REST API. Returns only the raw log messages you passed to logEntries at the time of logging.
+Query logentries.com via their REST API. Returns only the raw log messages you passed to logEntries at the time of logging. Uses [request-retry-stream](https://www.npmjs.com/package/request-retry-stream) in order to be more robust in case of network glitches.
 
 	npm install --save query-logentries
 
@@ -30,21 +30,22 @@ const opts = {
 	// stringDate that can be passed to a javascript Date object
 	to: '2017-01-02T23:59:59.999',
 
-	// Optional.
-	leqlQuery: ,
+	// Optional. Default to 'where()'. The leql query you wish to query with.
+	// Please ensure it is a valid leql query or you get statusCode 400 errors
+	// from logEntries.
+	leqlQuery: 'where(method=GET)',
 
-	// Optional.
-	queryUrl: ,
+	// Optional. Defaults to 50. How many messages should retried per paging
+	// request made to logEntries
+	perPage: 50,
 
-	// Optional.
-	queryUrl: ,
+	// Optional. Defaults to 30000 (30 seconds). How long should the request
+	// wait before it times out
+	timeout: 30000,
 
-	// Optional.
-	queryUrl: ,
-
-	// Optional.
-	queryUrl: ,
-
+	// Optional. Defaults to 5000 (5 seconds). How long should this module
+	// wait when checking if a query response is finished on logEntries
+	pollInterval: 5000
 };
 
 //------------------------------------------------------
