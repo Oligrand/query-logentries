@@ -53,7 +53,7 @@ const opts = {
 //Example with callback
 queryLogentries(opts, (err, messages) => {
 	if (err) {
-		//TODO handle err
+		return; //TODO handle err
 	}
 	console.log('messages', messages);
 });
@@ -66,8 +66,8 @@ const through2 = require('through2');
 const fs = require('fs');
 
 const toStringStream = through2.obj(function(message, enc, callback) {
-	this.push(JSON.stringify(message) + '\n')
-	callback()
+	this.push(JSON.stringify(message) + '\n');
+	callback();
 });
 const toFileStream = fs.createWriteStream('./result.txt');
 
