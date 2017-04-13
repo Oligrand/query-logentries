@@ -1,0 +1,39 @@
+{
+  "name": "query-logentries",
+  "version": "1.0.0",
+  "description": "Query logentries.com via their REST API",
+  "main": "index.js",
+  "scripts": {
+    "test": "istanbul cover _mocha",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oligrand/query-logentries.git"
+  },
+  "keywords": [
+    "logentries",
+    "query",
+    "rest",
+    "api"
+  ],
+  "author": "Oliver Grandvuinet <oligrand@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Oligrand/query-logentries/issues"
+  },
+  "homepage": "https://github.com/Oligrand/query-logentries#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "coveralls": "^2.13.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.2.0",
+    "mocha-eslint": "^3.0.1"
+  },
+  "dependencies": {
+    "concat-stream": "^1.6.0",
+    "from2": "^2.3.0",
+    "pump": "^1.0.2",
+    "request-retry-stream": "^2.0.0"
+  }
+}
