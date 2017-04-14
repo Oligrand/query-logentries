@@ -1,12 +1,16 @@
 # query-logentries
 
-[![npm version](https://badge.fury.io/js/query-logentries.svg)](https://badge.fury.io/js/query-logentries) [![Build Status](https://travis-ci.org/Oligrand/query-logentries.svg?branch=master)](https://travis-ci.org/Oligrand/query-logentries) [![Dependency Status](https://david-dm.org/Oligrand/query-logentriess.svg)](https://david-dm.org/Oligrand/query-logentries) [![devDependency Status](https://david-dm.org/Oligrand/query-logentries/dev-status.svg)](https://david-dm.org/Oligrand/query-logentries#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/github/Oligrand/query-logentries/badge.svg?branch=master)](https://coveralls.io/github/Oligrand/query-logentries?branch=master)
+[![npm version](https://badge.fury.io/js/query-logentries.svg)](https://badge.fury.io/js/query-logentries) [![Build Status](https://travis-ci.org/Oligrand/query-logentries.svg?branch=master)](https://travis-ci.org/Oligrand/query-logentries) [![dependencies Status](https://david-dm.org/Oligrand/query-logentries/status.svg)](https://david-dm.org/Oligrand/query-logentries) [![devDependency Status](https://david-dm.org/Oligrand/query-logentries/dev-status.svg)](https://david-dm.org/Oligrand/query-logentries#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/github/Oligrand/query-logentries/badge.svg?branch=master)](https://coveralls.io/github/Oligrand/query-logentries?branch=master)
 
 Query [logentries.com](https://logentries.com/) via their REST API. Returns only the raw log messages you passed to logEntries at the time of logging. Uses [request-retry-stream](https://www.npmjs.com/package/request-retry-stream) in order to be more robust in case of network glitches.
+
+## Installation
 
 	npm install --save query-logentries
 
 ## Usage
+
+How to initialize and available options:
 
 ```javascript
 const queryLogentriesFactory = require('query-logentries');
@@ -37,8 +41,8 @@ const opts = {
 	// get statusCode 400 errors from logEntries.
 	leqlQuery: 'where(method=GET)',
 
-	// Optional. Defaults to 50. How many messages should retried
-	// per paging request made to logEntries
+	// Optional. Defaults to 50. How many messages should be
+	// retrieved per paging request made to logEntries
 	perPage: 50,
 
 	// Optional. Defaults to 30000 (30 seconds). How long should
@@ -50,37 +54,38 @@ const opts = {
 	// finished on logEntries
 	pollInterval: 5000
 };
+```
 
-//------------------------------------------------------
+After initializing, using it with callback:
 
-//Example with callback
+```javascript
 queryLogentries(opts, (err, messages) => {
 	if (err) {
 		return; //TODO handle err
 	}
 	console.log('messages', messages);
 });
+```
 
-//------------------------------------------------------
+After initializing, using it with streaming:
 
-//Example with streaming
+```javascript
 const pump = require('pump');
 const through2 = require('through2');
 const fs = require('fs');
 
+const logEntriesStream = queryLogentries(opts);
 const toStringStream = through2.obj(function(message, enc, callback) {
 	this.push(JSON.stringify(message) + '\n');
 	callback();
 });
 const toFileStream = fs.createWriteStream('./result.txt');
 
-const logEntriesStream = queryLogentries(opts);
-pump(logEntriesStream, toStringStream, toFileStream), err => {
+pump(logEntriesStream, toStringStream, toFileStream, err => {
 	if (err) {
 		//TODO handle err
 	}
 });
-
 ```
 
 ## License
