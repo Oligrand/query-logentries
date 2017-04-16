@@ -1,6 +1,6 @@
 {
   "name": "query-logentries",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Query logentries.com via their REST API",
   "main": "index.js",
   "scripts": {
