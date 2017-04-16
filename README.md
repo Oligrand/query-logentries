@@ -49,10 +49,10 @@ const opts = {
 	//the request wait before it times out
 	timeout: 30000,
 
-	// Optional. Defaults to 5000 (5 seconds). How long should
+	// Optional. Defaults to 3000 (3 seconds). How long should
 	// this module wait when checking if a query response is
 	// finished on logEntries
-	pollInterval: 5000
+	pollInterval: 3000
 };
 ```
 

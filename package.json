@@ -24,16 +24,17 @@
   },
   "homepage": "https://github.com/Oligrand/query-logentries#readme",
   "devDependencies": {
-    "chai": "^3.5.0",
-    "coveralls": "^2.13.0",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.2.0",
-    "mocha-eslint": "^3.0.1"
+    "chai": "3.5.0",
+    "coveralls": "2.13.0",
+    "istanbul": "0.4.5",
+    "mocha": "3.2.0",
+    "mocha-eslint": "3.0.1",
+    "nock": "9.0.13"
   },
   "dependencies": {
-    "concat-stream": "^1.6.0",
-    "from2": "^2.3.0",
-    "pump": "^1.0.2",
-    "request-retry-stream": "^2.0.0"
+    "from2": "2.3.0",
+    "pump": "1.0.2",
+    "request-retry-stream": "2.0.0",
+    "through2": "2.0.3"
   }
 }
