@@ -6,8 +6,7 @@ var logId = '0b6f9b87-f2c8-4f6e-bbb3-c0860f7c280a';
 
 var baseOpts = {
 	logId,
-	from: '2017-01-01T00:00:00.000',
-	to: '2017-01-02T23:59:59.999'
+	from: '2017-01-01T00:00:00.000'
 };
 
 describe('validations and defaults', () => {
@@ -31,15 +30,25 @@ describe('validations and defaults', () => {
 		});
 	});
 
-	describe('when optional properties are missing in opts (minus "to")', () => {
+	describe('when optional properties are missing in opts', () => {
 		var nockLogEntries = nockLogEntriesFactory(apiKey, 'https://rest.logentries.com/query/');
 		var queryEndpointNock, pollEndpointNock, queryResult;
+
+		var dateNowBackup;
+		var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+		before(() => {
+			dateNowBackup = Date.now;
+			Date.now = () => dateNowValue;
+		});
+		after(() => {
+			Date.now = dateNowBackup;
+		});
 
 		before(() => {
 			var expectedParams = {
 				query: 'where()',
 				from: new Date(baseOpts.from).getTime(),
-				to: new Date(baseOpts.to).getTime(),
+				to: dateNowValue,
 				per_page: 50
 			};
 			var pollId = 'deace1fd-e605-41cd-a45c-5bf1ff0c3402-1';
