@@ -17,7 +17,7 @@ module.exports = function (apiKey, queryUrl) {
 		if(!opts.from) { throw new Error('"from" must be defined'); }
 
 		var to = opts.to || Date.now();
-		var leqlQuery = opts.leqlQuery || 'where()';
+		var query = opts.query || 'where()';
 		var perPage = opts.perPage || 50;
 		defaultRequestOpts.timeout = opts.timeout || 30000;
 		var pollInterval = opts.pollInterval || 3000;
@@ -26,7 +26,7 @@ module.exports = function (apiKey, queryUrl) {
 		var nextPageUrl = `${queryUrl}/${opts.logId}`;
 		var requestOpts = Object.assign({}, defaultRequestOpts, {
 			qs: {
-				query: leqlQuery,
+				query,
 				from: new Date(opts.from).getTime(),
 				to: new Date(to).getTime(),
 				per_page: perPage

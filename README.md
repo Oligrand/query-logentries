@@ -39,7 +39,7 @@ const opts = {
 	// Optional. Default to 'where()'. The leql query you wish to
 	// query with. Please ensure it is a valid leql query or you
 	// get statusCode 400 errors from logEntries.
-	leqlQuery: 'where(method=GET)',
+	query: 'where(method=GET)',
 
 	// Optional. Defaults to 50. How many messages should be
 	// retrieved per paging request made to logEntries

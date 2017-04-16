@@ -8,7 +8,7 @@ var baseOpts = {
 	logId,
 	from: '2017-01-01T00:00:00.000',
 	to: '2017-01-02T23:59:59.999',
-	leqlQuery: 'where(method=GET)',
+	query: 'where(method=GET)',
 	perPage: 2,
 	timeout: 3000,
 	pollInterval: 500
