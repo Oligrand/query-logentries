@@ -5,14 +5,12 @@ var through2 = require('through2');
 
 var apiKey = '6971aef7-998f-4cb2-9613-ddb42b9697b8';
 var logId = '0b6f9b87-f2c8-4f6e-bbb3-c0860f7c280a';
-var leqlQuery = 'where(method=GET)';
-var from = '2017-01-01T00:00:00.000';
 
 var baseOpts = {
 	logId,
-	from,
+	from: '2017-01-01T00:00:00.000',
 	to: '2017-01-02T23:59:59.999',
-	leqlQuery,
+	leqlQuery: 'where(method=GET)',
 	perPage: 2,
 	timeout: 3000,
 	pollInterval: 500
