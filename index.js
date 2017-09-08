@@ -1,5 +1,3 @@
-'use strict';
-
 var rrs = require('request-retry-stream');
 var from2 = require('from2');
 var pump = require('pump');
