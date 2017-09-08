@@ -38,7 +38,7 @@ module.exports = function (apiKey, queryUrl) {
 			}
 			if (nextPageUrl) {
 				requestOpts.url = nextPageUrl;
-				return requestQuery(requestOpts, (err, newBatch, pageUrl) => {
+				return requestQuery(requestOpts, function (err, newBatch, pageUrl) {
 					if (err) {
 						return next(err);
 					}
@@ -59,11 +59,11 @@ module.exports = function (apiKey, queryUrl) {
 		}
 
 		var result = [];
-		var concatStream = through2.obj(function(message, enc, cb) {
+		var concatStream = through2.obj(function (message, enc, cb) {
 			result.push(message);
 			cb();
 		});
-		pump(stream, concatStream, err => {
+		pump(stream, concatStream, function (err) {
 			if (err) {
 				return callback(err);
 			}
@@ -71,7 +71,7 @@ module.exports = function (apiKey, queryUrl) {
 		});
 
 		function requestQuery(reqOpts, cb) {
-			rrs.get(reqOpts, function(err, res, body) {
+			rrs.get(reqOpts, function (err, res, body) {
 				if (err) {
 					return cb(err);
 				}
@@ -88,7 +88,7 @@ module.exports = function (apiKey, queryUrl) {
 				poll();
 
 				function poll() {
-					rrs.get(pollOpts, function(err, res, pollBody) {
+					rrs.get(pollOpts, function (err, res, pollBody) {
 						if (err) {
 							return cb(err);
 						}
@@ -96,9 +96,15 @@ module.exports = function (apiKey, queryUrl) {
 							return setTimeout(poll, pollInterval);
 						}
 						if (res.statusCode === 200 && hasLink(pollBody) && pollBody.links[0].rel === 'Next') {
-							return cb(null, extractMessages(pollBody), pollBody.links[0].href);
+							return extractMessages(pollBody, opts, function (err, messages) {
+								if (err) {
+									return cb(err);
+								}
+								cb(null, messages, pollBody.links[0].href);
+							});
 						}
-						cb(null, extractMessages(pollBody));
+
+						extractMessages(pollBody, opts, cb);
 					});
 				}
 			}
@@ -110,14 +116,31 @@ function hasLink(body) {
 	return Array.isArray(body.links) && body.links[0];
 }
 
-function extractMessages(body) {
+function extractMessages(body, opts, cb) {
 	if (!body.events) {
-		return [];
+		return cb(null, []);
 	}
-	return body.events.map(function(event) {
-		if (!event.message) {
-			return null;
-		}
-		return JSON.parse(event.message);
-	}).filter(Boolean);
+
+	try {
+		var messages = body.events.map(function (event) {
+			if (!event.message) {
+				return null;
+			}
+			try {
+				return JSON.parse(event.message);
+			} catch (e) {
+				if (opts.ignoreInvalidJson) {
+					return null;
+				}
+				if (typeof opts.onInvalidJson === 'function') {
+					return opts.onInvalidJson(event.message);
+				}
+				throw e;
+			}
+		}).filter(Boolean);
+
+		return cb(null, messages);
+	} catch (e) {
+		return cb(e);
+	}
 }
