@@ -1,2 +1,2 @@
-const chai = require('chai');
+var chai = require('chai');
 global.expect = chai.expect;

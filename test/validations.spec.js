@@ -1,3 +1,5 @@
+'use strict';
+
 var queryLogentriesFactory = require('../index.js');
 var nockLogEntriesFactory = require('./nockLogEntries');
 
