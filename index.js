@@ -97,7 +97,10 @@ module.exports = function (apiKey, queryUrl) {
 						}
 						if (res.statusCode === 200 && hasLink(pollBody) && pollBody.links[0].rel === 'Next') {
 							return extractMessages(pollBody, opts, function (err, messages) {
-								cb(err, err ? null : messages, err ? null : pollBody.links[0].href);
+								if (err) {
+									return cb(err);
+								}
+								cb(null, messages, pollBody.links[0].href);
 							});
 						}
 
