@@ -118,6 +118,11 @@ function extractMessages(body) {
 		if (!event.message) {
 			return null;
 		}
-		return JSON.parse(event.message);
+
+		try {
+			return JSON.parse(event.message);
+		} catch (e) {
+			return null;
+		}
 	}).filter(Boolean);
 }
