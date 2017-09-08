@@ -36,6 +36,7 @@ describe('validations and defaults', () => {
 
 		var dateNowBackup;
 		var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+
 		before(() => {
 			dateNowBackup = Date.now;
 			Date.now = () => dateNowValue;
@@ -99,6 +100,7 @@ describe('validations and defaults', () => {
 
 			var dateNowBackup;
 			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+
 			before(() => {
 				dateNowBackup = Date.now;
 				Date.now = () => dateNowValue;
@@ -141,8 +143,20 @@ describe('validations and defaults', () => {
 		});
 
 		describe('and results are paged with default options', () => {
+			var baseOpts = {
+				logId: logId +'1',
+				from: '2017-01-01T00:00:00.000',
+				to: '2017-01-02T23:59:59.999',
+				query: 'where(method=GET)',
+				perPage: 2,
+				timeout: 3000,
+				pollInterval: 500
+			};
+
+
 			var nockLogEntries = nockLogEntriesFactory(apiKey, 'https://rest.logentries.com/query/');
 			var queryError;
+
 
 			before(() => {
 				var expectedParams = {
@@ -158,7 +172,7 @@ describe('validations and defaults', () => {
 						href: `https://rest.logentries.com/query/${pollId1}`
 					}]
 				};
-				nockLogEntries.createQueryEndpointNock(logId, expectedParams, 202, queryStatus);
+				nockLogEntries.createQueryEndpointNock(logId + '1', expectedParams, 202, queryStatus);
 
 				var page1 = {
 					progress: 100,
@@ -168,10 +182,28 @@ describe('validations and defaults', () => {
 					],
 					links: [{
 						rel: 'Next',
-						href: `https://rest.logentries.com/query/logs/${logId}?sequence_number=1`
+						href: `https://rest.logentries.com/query/logs/${logId + '1'}?sequence_number=1`
 					}]
 				};
 				nockLogEntries.createPollEndpointNock(pollId1, 200, page1);
+
+				var pollId2 = 'deace1fd-e605-41cd-a45c-5bf1ff0c3402-2';
+				var queryPage2Status = {
+					links: [{
+						rel: 'self',
+						href: `https://rest.logentries.com/query/${pollId2}`
+					}]
+				};
+				var expectedParams2 = { sequence_number: 1 };
+				nockLogEntries.createQueryEndpointNock(logId + '1', expectedParams2, 202, queryPage2Status);
+
+				var page2 = {
+					progress: 100,
+					events: [
+						{ message: '{"p1": "A3", "p2": 32}' }
+					]
+				};
+				nockLogEntries.createPollEndpointNock(pollId2, 200, page2);
 			});
 
 			before(done => {
@@ -192,6 +224,7 @@ describe('validations and defaults', () => {
 
 			var dateNowBackup;
 			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+
 			before(() => {
 				dateNowBackup = Date.now;
 				Date.now = () => dateNowValue;
@@ -245,6 +278,7 @@ describe('validations and defaults', () => {
 
 			var dateNowBackup;
 			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+
 			before(() => {
 				dateNowBackup = Date.now;
 				Date.now = () => dateNowValue;
