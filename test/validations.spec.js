@@ -163,7 +163,7 @@ describe('validations and defaults', () => {
 				var page1 = {
 					progress: 100,
 					events: [
-						{ message: '{"p1": "A1", "p2": 12}' },
+						{ message: '"p1": "A1", "p2": 12}' },
 						{ message: '{"p1": "A2", "p2": 22}' }
 					],
 					links: [{
@@ -172,24 +172,6 @@ describe('validations and defaults', () => {
 					}]
 				};
 				nockLogEntries.createPollEndpointNock(pollId1, 200, page1);
-
-				var pollId2 = 'deace1fd-e605-41cd-a45c-5bf1ff0c3402-3';
-				var queryPage2Status = {
-					links: [{
-						rel: 'self',
-						href: `https://rest.logentries.com/query/${pollId2}`
-					}]
-				};
-				var expectedParams2 = { sequence_number: 1 };
-				nockLogEntries.createQueryEndpointNock(logId, expectedParams2, 202, queryPage2Status);
-
-				var page2 = {
-					progress: 100,
-					events: [
-						{ message: '"p1": "A3", "p2": 32}' }
-					]
-				};
-				nockLogEntries.createPollEndpointNock(pollId2, 200, page2);
 			});
 
 			before(done => {
