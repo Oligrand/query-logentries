@@ -22,8 +22,8 @@ module.exports = function (apiKey, queryUrl) {
 		defaultRequestOpts.timeout = opts.timeout || 30000;
 		var pollInterval = opts.pollInterval || 3000;
 
-		let currentBatch = [];
-		let nextPageUrl = `${queryUrl}/${opts.logId}`;
+		var currentBatch = [];
+		var nextPageUrl = `${queryUrl}/${opts.logId}`;
 		var requestOpts = Object.assign({}, defaultRequestOpts, {
 			qs: {
 				query,
