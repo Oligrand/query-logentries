@@ -141,7 +141,7 @@ describe('validations and defaults', () => {
 
 		describe('with ignore option', () => {
 			var nockLogEntries = nockLogEntriesFactory(apiKey, 'https://rest.logentries.com/query/');
-			let queryResult;
+			var queryResult;
 
 			var dateNowBackup;
 			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
@@ -194,7 +194,7 @@ describe('validations and defaults', () => {
 
 		describe('with onInvalidJson callback option', () => {
 			var nockLogEntries = nockLogEntriesFactory(apiKey, 'https://rest.logentries.com/query/');
-			let queryResult;
+			var queryResult;
 
 			var dateNowBackup;
 			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
