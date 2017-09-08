@@ -1,12 +1,12 @@
-var rrs = require('request-retry-stream');
-var from2 = require('from2');
-var pump = require('pump');
-var through2 = require('through2');
+const rrs = require('request-retry-stream');
+const from2 = require('from2');
+const pump = require('pump');
+const through2 = require('through2');
 
 module.exports = function (apiKey, queryUrl) {
 	if(!apiKey) { throw new Error('"apiKey" must be defined'); }
 
-	var defaultRequestOpts = {
+	const defaultRequestOpts = {
 		headers: { 'x-api-key': apiKey },
 		json: true
 	};
@@ -16,15 +16,15 @@ module.exports = function (apiKey, queryUrl) {
 		if(!opts.logId) { throw new Error('"logId" must be defined'); }
 		if(!opts.from) { throw new Error('"from" must be defined'); }
 
-		var to = opts.to || Date.now();
-		var query = opts.query || 'where()';
-		var perPage = opts.perPage || 50;
+		const to = opts.to || Date.now();
+		const query = opts.query || 'where()';
+		const perPage = opts.perPage || 50;
 		defaultRequestOpts.timeout = opts.timeout || 30000;
-		var pollInterval = opts.pollInterval || 3000;
+		const pollInterval = opts.pollInterval || 3000;
 
-		var currentBatch = [];
-		var nextPageUrl = `${queryUrl}/${opts.logId}`;
-		var requestOpts = Object.assign({}, defaultRequestOpts, {
+		let currentBatch = [];
+		let nextPageUrl = `${queryUrl}/${opts.logId}`;
+		const requestOpts = Object.assign({}, defaultRequestOpts, {
 			qs: {
 				query,
 				from: new Date(opts.from).getTime(),
@@ -32,7 +32,7 @@ module.exports = function (apiKey, queryUrl) {
 				per_page: perPage
 			}
 		});
-		var stream = from2.obj(function (size, next) {
+		const stream = from2.obj(function (size, next) {
 			if (currentBatch.length > 0) {
 				return next(null, currentBatch.shift());
 			}
@@ -58,8 +58,8 @@ module.exports = function (apiKey, queryUrl) {
 			return stream;
 		}
 
-		var result = [];
-		var concatStream = through2.obj(function(message, enc, cb) {
+		const result = [];
+		const concatStream = through2.obj((message, enc, cb) => {
 			result.push(message);
 			cb();
 		});
@@ -71,7 +71,7 @@ module.exports = function (apiKey, queryUrl) {
 		});
 
 		function requestQuery(reqOpts, cb) {
-			rrs.get(reqOpts, function(err, res, body) {
+			rrs.get(reqOpts, (err, res, body) => {
 				if (err) {
 					return cb(err);
 				}
@@ -82,13 +82,13 @@ module.exports = function (apiKey, queryUrl) {
 			});
 
 			function waitForResult(pollUrl) {
-				var pollOpts = Object.assign({}, defaultRequestOpts, {
+				const pollOpts = Object.assign({}, defaultRequestOpts, {
 					url: pollUrl
 				});
 				poll();
 
 				function poll() {
-					rrs.get(pollOpts, function(err, res, pollBody) {
+					rrs.get(pollOpts, (err, res, pollBody) => {
 						if (err) {
 							return cb(err);
 						}
@@ -96,9 +96,12 @@ module.exports = function (apiKey, queryUrl) {
 							return setTimeout(poll, pollInterval);
 						}
 						if (res.statusCode === 200 && hasLink(pollBody) && pollBody.links[0].rel === 'Next') {
-							return cb(null, extractMessages(pollBody), pollBody.links[0].href);
+							return extractMessages(pollBody, opts, (err, messages) =>
+								cb(err, err ? null : messages, err ? null : pollBody.links[0].href)
+							);
 						}
-						cb(null, extractMessages(pollBody));
+
+						extractMessages(pollBody, opts, cb);
 					});
 				}
 			}
@@ -110,14 +113,31 @@ function hasLink(body) {
 	return Array.isArray(body.links) && body.links[0];
 }
 
-function extractMessages(body) {
+function extractMessages(body, opts, cb) {
 	if (!body.events) {
-		return [];
+		return cb(null, []);
 	}
-	return body.events.map(function(event) {
-		if (!event.message) {
-			return null;
-		}
-		return JSON.parse(event.message);
-	}).filter(Boolean);
+
+	try {
+		const messages = body.events.map((event) => {
+			if (!event.message) {
+				return null;
+			}
+			try {
+				return JSON.parse(event.message);
+			} catch (e) {
+				if (opts.ignoreInvalidJson) {
+					return null;
+				}
+				if (typeof opts.onInvalidJson === 'function') {
+					return opts.onInvalidJson(event.message);
+				}
+				throw e;
+			}
+		}).filter(Boolean);
+
+		return cb(null, messages);
+	} catch (e) {
+		return cb(e);
+	}
 }

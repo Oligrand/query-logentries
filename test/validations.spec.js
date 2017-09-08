@@ -91,4 +91,161 @@ describe('validations and defaults', () => {
 			]);
 		});
 	});
+
+	describe('when json is not valid', () => {
+		describe('with default options', () => {
+			var nockLogEntries = nockLogEntriesFactory(apiKey, 'https://rest.logentries.com/query/');
+
+			var dateNowBackup;
+			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+			before(() => {
+				dateNowBackup = Date.now;
+				Date.now = () => dateNowValue;
+			});
+			after(() => {
+				Date.now = dateNowBackup;
+			});
+
+			before(() => {
+				var expectedParams = {
+					query: 'where()',
+					from: new Date(baseOpts.from).getTime(),
+					to: dateNowValue,
+					per_page: 50
+				};
+				var pollId = 'deace1fd-e605-41cd-a45c-5bf1ff0c3402-1';
+				var queryStatus = {
+					links: [{
+						rel: 'self',
+						href: `https://rest.logentries.com/query/${pollId}`
+					}]
+				};
+				nockLogEntries.createQueryEndpointNock(logId, expectedParams, 202, queryStatus);
+				var realResult = {
+					progress: 100,
+					events: [
+						{ message: '"p1": "A1", "p2": 12}' },
+						{ message: '{"p1": "A2", "p2": 22}' }
+					]
+				};
+				nockLogEntries.createPollEndpointNock(pollId, 200, realResult);
+			});
+
+			it('should throw exception', (done) => {
+				queryLogentries(baseOpts, (err) => {
+					expect(err).to.be.an('error');
+					done();
+				});
+			});
+		});
+
+		describe('with ignore option', () => {
+			var nockLogEntries = nockLogEntriesFactory(apiKey, 'https://rest.logentries.com/query/');
+			let queryResult;
+
+			var dateNowBackup;
+			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+			before(() => {
+				dateNowBackup = Date.now;
+				Date.now = () => dateNowValue;
+			});
+			after(() => {
+				Date.now = dateNowBackup;
+			});
+
+			before(() => {
+				var expectedParams = {
+					query: 'where()',
+					from: new Date(baseOpts.from).getTime(),
+					to: dateNowValue,
+					per_page: 50
+				};
+				var pollId = 'deace1fd-e605-41cd-a45c-5bf1ff0c3402-1';
+				var queryStatus = {
+					links: [{
+						rel: 'self',
+						href: `https://rest.logentries.com/query/${pollId}`
+					}]
+				};
+				nockLogEntries.createQueryEndpointNock(logId, expectedParams, 202, queryStatus);
+				var realResult = {
+					progress: 100,
+					events: [
+						{ message: '"p1": "A1", "p2": 12}' },
+						{ message: '{"p1": "A2", "p2": 22}' }
+					]
+				};
+				nockLogEntries.createPollEndpointNock(pollId, 200, realResult);
+			});
+
+			before((done) => {
+				queryLogentries(Object.assign({ignoreInvalidJson: true}, baseOpts), (err, messages) => {
+					queryResult = messages;
+					done(err);
+				});
+			});
+
+			it('should ignore first message', () => {
+				expect(queryResult).to.eql([
+					{p1: 'A2', p2: 22}
+				]);
+			});
+		});
+
+		describe('with onInvalidJson callback option', () => {
+			var nockLogEntries = nockLogEntriesFactory(apiKey, 'https://rest.logentries.com/query/');
+			let queryResult;
+
+			var dateNowBackup;
+			var dateNowValue = new Date('2017-01-02T23:59:59.999').getTime();
+			before(() => {
+				dateNowBackup = Date.now;
+				Date.now = () => dateNowValue;
+			});
+			after(() => {
+				Date.now = dateNowBackup;
+			});
+
+			before(() => {
+				var expectedParams = {
+					query: 'where()',
+					from: new Date(baseOpts.from).getTime(),
+					to: dateNowValue,
+					per_page: 50
+				};
+				var pollId = 'deace1fd-e605-41cd-a45c-5bf1ff0c3402-1';
+				var queryStatus = {
+					links: [{
+						rel: 'self',
+						href: `https://rest.logentries.com/query/${pollId}`
+					}]
+				};
+				nockLogEntries.createQueryEndpointNock(logId, expectedParams, 202, queryStatus);
+				var realResult = {
+					progress: 100,
+					events: [
+						{ message: '"p1": "A1", "p2": 12}' },
+						{ message: '{"p1": "A2", "p2": 22}' }
+					]
+				};
+				nockLogEntries.createPollEndpointNock(pollId, 200, realResult);
+			});
+
+			before((done) => {
+				queryLogentries(Object.assign({onInvalidJson: (message) => ({invalidJson: message})}, baseOpts), (err, messages) => {
+					queryResult = messages;
+					done(err);
+				});
+			});
+
+			it('should transform first message', () => {
+				expect(queryResult).to.eql([
+					{invalidJson: '"p1": "A1", "p2": 12}'},
+					{p1: 'A2', p2: 22}
+				]);
+			});
+		});
+
+	});
+
 });
