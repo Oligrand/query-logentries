@@ -1,12 +1,12 @@
-const rrs = require('request-retry-stream');
-const from2 = require('from2');
-const pump = require('pump');
-const through2 = require('through2');
+var rrs = require('request-retry-stream');
+var from2 = require('from2');
+var pump = require('pump');
+var through2 = require('through2');
 
 module.exports = function (apiKey, queryUrl) {
 	if(!apiKey) { throw new Error('"apiKey" must be defined'); }
 
-	const defaultRequestOpts = {
+	var defaultRequestOpts = {
 		headers: { 'x-api-key': apiKey },
 		json: true
 	};
@@ -16,15 +16,15 @@ module.exports = function (apiKey, queryUrl) {
 		if(!opts.logId) { throw new Error('"logId" must be defined'); }
 		if(!opts.from) { throw new Error('"from" must be defined'); }
 
-		const to = opts.to || Date.now();
-		const query = opts.query || 'where()';
-		const perPage = opts.perPage || 50;
+		var to = opts.to || Date.now();
+		var query = opts.query || 'where()';
+		var perPage = opts.perPage || 50;
 		defaultRequestOpts.timeout = opts.timeout || 30000;
-		const pollInterval = opts.pollInterval || 3000;
+		var pollInterval = opts.pollInterval || 3000;
 
 		let currentBatch = [];
 		let nextPageUrl = `${queryUrl}/${opts.logId}`;
-		const requestOpts = Object.assign({}, defaultRequestOpts, {
+		var requestOpts = Object.assign({}, defaultRequestOpts, {
 			qs: {
 				query,
 				from: new Date(opts.from).getTime(),
@@ -32,13 +32,13 @@ module.exports = function (apiKey, queryUrl) {
 				per_page: perPage
 			}
 		});
-		const stream = from2.obj(function (size, next) {
+		var stream = from2.obj(function (size, next) {
 			if (currentBatch.length > 0) {
 				return next(null, currentBatch.shift());
 			}
 			if (nextPageUrl) {
 				requestOpts.url = nextPageUrl;
-				return requestQuery(requestOpts, (err, newBatch, pageUrl) => {
+				return requestQuery(requestOpts, function (err, newBatch, pageUrl) {
 					if (err) {
 						return next(err);
 					}
@@ -58,12 +58,12 @@ module.exports = function (apiKey, queryUrl) {
 			return stream;
 		}
 
-		const result = [];
-		const concatStream = through2.obj((message, enc, cb) => {
+		var result = [];
+		var concatStream = through2.obj(function (message, enc, cb) {
 			result.push(message);
 			cb();
 		});
-		pump(stream, concatStream, err => {
+		pump(stream, concatStream, function (err) {
 			if (err) {
 				return callback(err);
 			}
@@ -71,7 +71,7 @@ module.exports = function (apiKey, queryUrl) {
 		});
 
 		function requestQuery(reqOpts, cb) {
-			rrs.get(reqOpts, (err, res, body) => {
+			rrs.get(reqOpts, function (err, res, body) {
 				if (err) {
 					return cb(err);
 				}
@@ -82,13 +82,13 @@ module.exports = function (apiKey, queryUrl) {
 			});
 
 			function waitForResult(pollUrl) {
-				const pollOpts = Object.assign({}, defaultRequestOpts, {
+				var pollOpts = Object.assign({}, defaultRequestOpts, {
 					url: pollUrl
 				});
 				poll();
 
 				function poll() {
-					rrs.get(pollOpts, (err, res, pollBody) => {
+					rrs.get(pollOpts, function (err, res, pollBody) {
 						if (err) {
 							return cb(err);
 						}
@@ -96,9 +96,9 @@ module.exports = function (apiKey, queryUrl) {
 							return setTimeout(poll, pollInterval);
 						}
 						if (res.statusCode === 200 && hasLink(pollBody) && pollBody.links[0].rel === 'Next') {
-							return extractMessages(pollBody, opts, (err, messages) =>
-								cb(err, err ? null : messages, err ? null : pollBody.links[0].href)
-							);
+							return extractMessages(pollBody, opts, function (err, messages) {
+								cb(err, err ? null : messages, err ? null : pollBody.links[0].href);
+							});
 						}
 
 						extractMessages(pollBody, opts, cb);
@@ -119,7 +119,7 @@ function extractMessages(body, opts, cb) {
 	}
 
 	try {
-		const messages = body.events.map((event) => {
+		var messages = body.events.map(function (event) {
 			if (!event.message) {
 				return null;
 			}
