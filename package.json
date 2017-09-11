@@ -36,5 +36,8 @@
     "pump": "1.0.2",
     "request-retry-stream": "2.0.0",
     "through2": "2.0.3"
-  }
+  },
+  "files": [
+    "index.js"
+  ]
 }
